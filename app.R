@@ -56,7 +56,7 @@ wthrcontent<-c("어디 날씨를 알려드릴까요?",
 studycontent<-c("오! 알려주시면 공부해볼께요~",
                 "제가 알아들을 수 있는 말이겠죠?ㅎㅎ 어떻게 하시나요?",
                 "이제 공부모드로 들어가야 겠군요!",
-                "알려주셔서 감사해요!ㅎㅎ",
+                "알려주시는거에 미리 감사드릴께요!ㅎㅎ",
                 "입력을 기다리고 있습니다.",
                 "알려주시면 공부 노트에 써둘께요!")
 
@@ -72,7 +72,7 @@ jug() %>%
   }) %>%
   get("/keyboard", function(req,res,err){
     body<-list(type="buttons",
-               buttons= c("날씨 알려줘","날씨 물어볼 땐 이렇게 말해","이렇게 알려주면 좋을 것 같아"))
+               buttons= c("날씨 알려줘","사람들은 날씨를 이렇게 물어본단다","날씨를 이렇게 알려주면 좋을 것 같아"))
     res$json(body)
     res$set_header("Content-Type", "application/json; charset=utf-8")
   }) %>% 
@@ -89,7 +89,7 @@ jug() %>%
       body<-body<-list(message=list(text="버튼 올려드립니다!"),
                        keyboard=list(
                         type="buttons",
-                       buttons= c("날씨 알려줘","날씨 물어볼 땐 이렇게 말해","이렇게 알려주면 좋을 것 같아")))
+                       buttons= c("날씨 알려줘","사람들은 날씨를 이렇게 물어본단다","날씨를 이렇게 알려주면 좋을 것 같아")))
       res$json(body)
       res$set_header("Content-Type", "application/json; charset=utf-8")
       return(res)      
