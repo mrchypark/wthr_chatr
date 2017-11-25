@@ -103,7 +103,7 @@ jug() %>%
       return(res)      
     }
     
-    if(content=="날씨 물어볼 땐 이렇게 말해"){
+    if(content=="사람들은 날씨를 이렇게 물어본단다"){
       resu<-sample(studycontent,1)
       body<-list(message=list(text=resu))
       res$json(body)
@@ -111,7 +111,7 @@ jug() %>%
       return(res)      
     }
 
-    if(content=="이렇게 알려주면 좋을 것 같아"){
+    if(content=="날씨를 이렇게 알려주면 좋을 것 같아"){
       resu<-sample(mentcontent,1)
       body<-list(message=list(text=resu))
       res$json(body)
