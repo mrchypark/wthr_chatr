@@ -85,6 +85,14 @@ jug() %>%
     ping(body)
     content<-body$content
     
+    if(content=="버튼"){
+      body<-body<-list(type="buttons",
+                       buttons= c("날씨 알려줘","날씨 물어볼 땐 이렇게 말해","이렇게 알려주면 좋을 것 같아"))
+      res$json(body)
+      res$set_header("Content-Type", "application/json; charset=utf-8")
+      return(res)      
+    }
+    
     if(content=="날씨 알려줘"){
       resu<-sample(wthrcontent,1)
       body<-list(message=list(text=resu))
