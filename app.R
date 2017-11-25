@@ -35,6 +35,35 @@ library(stringr)
 library(jug)
 library(googleformr)
 
+form <- "https://docs.google.com/forms/d/1pJsY_O9jBljHZljfVQAlWrPxPIshUzyhMdmolLyCBcA"
+ping <- googleformr::gformr(form)
+
+wthrrecontent<-c("날씨를 물어봐주세요.",
+                 "날씨가 궁금하신게 맞나요?",
+                 "날씨가 아니면 잘 모릅니다.",
+                 "그거 말고 날씨는 잘 대답할 수 있어요!",
+                 "날씨 궁금하신게 아니군요?",
+                 "날씨는 궁금하지 않으신거에요?",
+                 "그걸 날씨로 대답하기는 정말 어렵네요.")
+
+wthrcontent<-c("어디 날씨를 알려드릴까요?",
+               "지금 어디 계세요?",
+               "어디를 알아봐드릴까요?",
+               "위치를 알려주시면 알아볼께요!",
+               "지역 이름을 알려주시면 제가 찾아볼수 있어요!",
+               "제가 한번 알아보려는데, 어디 계신건가요?")
+
+studycontent<-c("오! 알려주시면 공부해볼께요~",
+                "제가 알아들을 수 있는 말이겠죠?ㅎㅎ 어떻게 하시나요?",
+                "이제 공부모드로 들어가야 겠군요!",
+                "알려주셔서 감사해요!ㅎㅎ",
+                "입력을 기다리고 있습니다.",
+                "알려주시면 공부 노트에 써둘께요!")
+
+mentcontetn<-c("제가 좀 딱딱하게 말하죠? 뭐라고 하면 좋을까요?",
+               "제 고민이 그거에요! 뭐라고 알려드려야 할까요?",
+               "어떤 걸 알려드려야 할지도 고민이더라구요!ㅎㅎ 뭐라고 하면 좋을까요?")
+
 jug() %>%
   cors() %>% 
   get("/", function(req, res, err){
@@ -43,32 +72,49 @@ jug() %>%
   }) %>%
   get("/keyboard", function(req,res,err){
     body<-list(type="buttons",
-               buttons= c("서울 날씨","강원도 날씨","날씨 알려줘"))
+               buttons= c("날씨 알려줘","날씨 물어볼 땐 이렇게 말해","이렇게 알려주면 좋을 것 같아"))
     res$json(body)
     res$set_header("Content-Type", "application/json; charset=utf-8")
   }) %>% 
   post("/message", function(req,res,err){
     body<-jsonlite::fromJSON(req$body)
     print(body$content)
-    form <- "https://docs.google.com/forms/d/1pJsY_O9jBljHZljfVQAlWrPxPIshUzyhMdmolLyCBcA"
-    ping <- googleformr::gformr(form)
     body<-list(user_key=body$user_key,
                type=body$type,
                content=body$content)
     ping(body)
     content<-body$content
+    
+    if(content=="날씨 알려줘"){
+      resu<-sample(wthrcontent,1)
+      body<-list(message=list(text=resu))
+      res$json(body)
+      res$set_header("Content-Type", "application/json; charset=utf-8")
+      return(res)      
+    }
+    
+    if(content=="날씨 물어볼 땐 이렇게 말해"){
+      resu<-sample(studycontent,1)
+      body<-list(message=list(text=resu))
+      res$json(body)
+      res$set_header("Content-Type", "application/json; charset=utf-8")
+      return(res)      
+    }
+
+    if(content=="이렇게 알려주면 좋을 것 같아"){
+      resu<-sample(mentcontent,1)
+      body<-list(message=list(text=resu))
+      res$json(body)
+      res$set_header("Content-Type", "application/json; charset=utf-8")
+      return(res)      
+    }
+    
+    
     root <- "http://search.daum.net/search?nil_suggest=btn&w=tot&DA=SBC&q="
     content<-paste("날씨", content)
     content<-gsub(" ","+",content)
     content <- URLencode(content)
     tar <- paste0(root,content)
-    wthrrecontent<-c("날씨를 물어봐주세요.",
-                     "날씨가 궁금하신게 맞나요?",
-                     "날씨가 아니면 잘 모릅니다.",
-                     "그거 말고 날씨는 잘 대답할 수 있어요!",
-                     "날씨 궁금하신게 아니군요?",
-                     "날씨는 궁금하지 않으신거에요?",
-                     "그걸 날씨로 대답하기는 정말 어렵네요.")
     
     root <- tar %>% 
       read_html
@@ -89,6 +135,7 @@ jug() %>%
       resu<-paste0("지역이 너무 넓네요. 혹시 ",paste0(chkmulti, collapse = ", "), "중에 어디가 궁금하신가요?")
       body<-list(message=list(text=resu))
       res$json(body)
+      res$set_header("Content-Type", "application/json; charset=utf-8")
       return(res)
     }
     
@@ -96,6 +143,7 @@ jug() %>%
       resu<-sample(wthrrecontent,1)
       body<-list(message=list(text=resu))
       res$json(body)
+      res$set_header("Content-Type", "application/json; charset=utf-8")
       return(res)
     }
     
@@ -140,6 +188,7 @@ jug() %>%
       resu<-paste0("어느 지역이 궁금하세요?")
       body<-list(message=list(text=resu))
       res$json(body)
+      res$set_header("Content-Type", "application/json; charset=utf-8")
       return(res)
     }
     locc<-length(loc)
@@ -165,10 +214,9 @@ jug() %>%
                daily[3], ", 오후 ", daily[6])
     }
     resu<-paste0(day, "의 " ,loc ,"(은/는) ", daily,"입니다. ",locm)
-    body<-list(message=list(text=resu),
-              keyboard=list(type="buttons",
-               buttons= c("서울 날씨","강원도 날씨","날씨 알려줘")))
+    body<-list(message=list(text=resu))
     res$json(body)
+    res$set_header("Content-Type", "application/json; charset=utf-8")
     return(res)
   }) %>% 
   logger(threshold = futile.logger::DEBUG, log_file='logfile.log', console=TRUE) %>%
